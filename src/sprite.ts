@@ -70,6 +70,7 @@ export class Sprite {
     const dh = sh * scale
 
     ctx.save()
+    ctx.imageSmoothingEnabled = false
     if (this.flipX) {
       ctx.translate(x + dw, y)
       ctx.scale(-1, 1)
