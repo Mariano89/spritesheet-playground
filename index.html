@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spritesheet Playground</title>
+  </head>
+  <body>
+    <div id="screen-landing" class="screen active">
+      <div class="landing-content">
+        <h1>Spritesheet Playground</h1>
+        <p class="subtitle">Import a spritesheet, map animations, and test them in a mini platformer.</p>
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-zone-inner">
+            <div class="drop-icon">&#128444;</div>
+            <p>Drag &amp; drop your spritesheet <strong>PNG</strong> and <strong>JSON</strong> here</p>
+            <span class="drop-hint">or</span>
+            <label class="file-btn">
+              Choose Files
+              <input type="file" id="file-input" multiple accept=".png,.json" hidden />
+            </label>
+          </div>
+        </div>
+        <div id="load-status" class="load-status"></div>
+      </div>
+    </div>
+
+    <div id="screen-mapper" class="screen">
+      <div class="mapper-layout">
+        <aside class="mapper-sidebar">
+          <h2>Animation Mapper</h2>
+          <p class="sidebar-hint">Map frame ranges to animations. Set start and end to the same frame for a static pose. Idle must be mapped to enable the game.</p>
+          <div id="animation-fields"></div>
+          <button id="btn-back-landing" class="btn btn-secondary">Back</button>
+        </aside>
+        <div class="mapper-main">
+          <div class="game-area">
+            <canvas id="game-canvas"></canvas>
+            <div class="game-hud">
+              <span id="hud-state">—</span>
+            </div>
+            <div id="game-placeholder" class="game-placeholder">
+              Map idle animation to start the game
+            </div>
+          </div>
+          <div class="bottom-panels">
+            <div class="frame-grid-container">
+              <h3>Frames</h3>
+              <canvas id="frame-grid-canvas"></canvas>
+            </div>
+            <div class="preview-container">
+              <h3>Preview</h3>
+              <canvas id="preview-canvas" width="128" height="128"></canvas>
+              <div id="preview-label" class="preview-label">Select an animation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

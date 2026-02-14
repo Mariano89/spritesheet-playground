@@ -1,0 +1,349 @@
+@use 'variables' as *;
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: $bg;
+  color: $text;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  height: 100%;
+
+  &.active { display: flex; }
+}
+
+// Buttons
+
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: $radius;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: $accent;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: $accent-hover; }
+}
+
+.btn-secondary {
+  background: $surface-light;
+  color: $text;
+
+  &:hover { background: $border; }
+}
+
+.btn-small {
+  padding: 6px 14px;
+  font-size: 12px;
+  background: $surface-light;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: $radius;
+  cursor: pointer;
+
+  &:hover { background: $border; }
+}
+
+// Landing
+
+.landing-content {
+  margin: auto;
+  text-align: center;
+  max-width: 520px;
+  padding: 20px;
+
+  h1 { font-size: 2.4rem; margin-bottom: 8px; }
+}
+
+.subtitle {
+  color: $text-dim;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.drop-zone {
+  border: 2px dashed $border;
+  border-radius: $radius;
+  padding: 48px 24px;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+
+  &.dragover {
+    border-color: $accent;
+    background: rgba($accent, 0.06);
+  }
+
+  p { margin-bottom: 8px; }
+}
+
+.drop-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+.drop-hint {
+  display: block;
+  color: $text-dim;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.file-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: $accent;
+  color: #fff;
+  border-radius: $radius;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: $accent-hover; }
+}
+
+.load-status {
+  margin-top: 16px;
+  min-height: 24px;
+  font-size: 13px;
+
+  &.error { color: $accent; }
+  &.success { color: $success; }
+}
+
+// Mapper
+
+.mapper-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.mapper-sidebar {
+  width: 320px;
+  min-width: 320px;
+  background: $surface;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 1px solid $border;
+
+  h2 { font-size: 1.2rem; }
+
+  .btn { width: 100%; }
+}
+
+.sidebar-hint {
+  font-size: 13px;
+  color: $text-dim;
+  line-height: 1.4;
+}
+
+.anim-group {
+  background: $surface-light;
+  border-radius: $radius;
+  padding: 12px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+  cursor: pointer;
+
+  &--active {
+    border-color: $accent;
+
+    .preview-icon { opacity: 1; }
+  }
+
+  &:hover:not(&--active) {
+    border-color: $border;
+  }
+}
+
+.anim-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: capitalize;
+    pointer-events: none;
+  }
+
+  .preview-icon {
+    font-size: 11px;
+    color: $accent;
+    opacity: 0.3;
+    transition: opacity 0.15s;
+  }
+}
+
+.anim-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    span {
+      font-size: 11px;
+      color: $text-dim;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 6px 8px;
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: 4px;
+    color: $text;
+    font-size: 13px;
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
+  }
+}
+
+.scale-slider {
+  width: 100%;
+  accent-color: $accent;
+  cursor: pointer;
+}
+
+.scale-value {
+  font-size: 12px;
+  color: $text-dim;
+  font-family: monospace;
+}
+
+.mapper-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Game area (embedded)
+
+.game-area {
+  flex: 1;
+  position: relative;
+  min-height: 200px;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  background: #0f0f23;
+  border-radius: 0 $radius 0 0;
+}
+
+.game-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-dim;
+  font-size: 14px;
+  background: $surface;
+  border-radius: 0 $radius 0 0;
+}
+
+.game-hud {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba($bg, 0.75);
+  padding: 4px 10px;
+  border-radius: $radius;
+  font-size: 12px;
+  backdrop-filter: blur(4px);
+
+  #hud-state {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: $accent;
+  }
+}
+
+// Bottom panels (frames + preview)
+
+.bottom-panels {
+  display: flex;
+  gap: 1px;
+  background: $border;
+  border-top: 1px solid $border;
+  min-height: 180px;
+  max-height: 220px;
+}
+
+.frame-grid-container {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  background: $surface;
+
+  h3 { font-size: 13px; color: $text-dim; margin-bottom: 8px; }
+}
+
+#frame-grid-canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.preview-container {
+  width: 180px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: $surface;
+
+  h3 { font-size: 13px; color: $text-dim; }
+}
+
+#preview-canvas {
+  image-rendering: pixelated;
+  background: repeating-conic-gradient(#2a2a3e 0% 25%, #222238 0% 50%) 0 0 / 16px 16px;
+  border-radius: 4px;
+}
+
+.preview-label {
+  font-size: 11px;
+  color: $text-dim;
+}
