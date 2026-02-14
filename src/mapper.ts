@@ -115,6 +115,22 @@ export function initMapper(image: HTMLImageElement, meta: SpritesheetMeta) {
     { signal },
   )
 
+  if (meta.animations) {
+    for (const anim of ANIM_TYPES) {
+      const animMeta = meta.animations[anim.name]
+      if (!animMeta) continue
+      const inp = inputs[anim.name]
+      const saved = savedValues[anim.name]
+      if (saved && (saved.start !== '' || saved.end !== '')) continue
+      const startFrame = animMeta.row * meta.columns
+      const endFrame = startFrame + animMeta.frames - 1
+      inp.start.value = String(startFrame)
+      inp.end.value = String(endFrame)
+      inp.fps.value = String(animMeta.fps)
+    }
+    saveState()
+  }
+
   drawFrameGrid(gridCanvas, image, meta)
   highlightActive()
 
@@ -254,12 +270,26 @@ export function initMapper(image: HTMLImageElement, meta: SpritesheetMeta) {
       const x = (e.clientX - rect.left) * scaleX
       const y = (e.clientY - rect.top) * scaleY
 
-      const cols = Math.min(meta.columns, 10)
-      const col = Math.floor(x / CELL_SIZE)
-      const row = Math.floor(y / CELL_SIZE)
-      const frameIndex = row * cols + col
+      let frameIndex: number
 
-      if (frameIndex < 0 || frameIndex >= meta.frameCount) return
+      if (meta.animations) {
+        const animEntries = Object.entries(meta.animations)
+        const rowHeight = CELL_SIZE + LABEL_HEIGHT
+        const animRow = Math.floor(y / rowHeight)
+        if (animRow < 0 || animRow >= animEntries.length) return
+        const [, anim] = animEntries[animRow]
+        const yInRow = y - animRow * rowHeight
+        if (yInRow < LABEL_HEIGHT) return
+        const col = Math.floor(x / CELL_SIZE)
+        if (col < 0 || col >= anim.frames) return
+        frameIndex = anim.row * meta.columns + col
+      } else {
+        const cols = Math.min(meta.columns, 10)
+        const col = Math.floor(x / CELL_SIZE)
+        const row = Math.floor(y / CELL_SIZE)
+        frameIndex = row * cols + col
+        if (frameIndex < 0 || frameIndex >= meta.frameCount) return
+      }
 
       for (const anim of ANIM_TYPES) {
         const inp = inputs[anim.name]
@@ -298,6 +328,11 @@ function drawFrameGrid(
   image: HTMLImageElement,
   meta: SpritesheetMeta,
 ) {
+  if (meta.animations) {
+    drawFrameGridV2(canvas, image, meta)
+    return
+  }
+
   const cols = Math.min(meta.columns, 10)
   const rows = Math.ceil(meta.frameCount / cols)
 
@@ -345,5 +380,69 @@ function drawFrameGrid(
     ctx.fillStyle = 'rgba(255,255,255,0.7)'
     ctx.font = 'bold 11px monospace'
     ctx.fillText(String(i), dx + 3, dy + 13)
+  }
+}
+
+const LABEL_HEIGHT = 18
+
+function drawFrameGridV2(
+  canvas: HTMLCanvasElement,
+  image: HTMLImageElement,
+  meta: SpritesheetMeta,
+) {
+  const anims = meta.animations!
+  const animEntries = Object.entries(anims)
+  const cols = Math.min(meta.columns, 10)
+  const rowHeight = CELL_SIZE + LABEL_HEIGHT
+
+  canvas.width = cols * CELL_SIZE
+  canvas.height = animEntries.length * rowHeight
+
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = '#16213e'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  for (let r = 0; r < animEntries.length; r++) {
+    const [name, anim] = animEntries[r]
+    const yOffset = r * rowHeight
+
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
+    ctx.font = 'bold 11px monospace'
+    ctx.fillText(name, 4, yOffset + 13)
+
+    for (let f = 0; f < anim.frames; f++) {
+      const dx = f * CELL_SIZE + THUMB_PAD / 2
+      const dy = yOffset + LABEL_HEIGHT + THUMB_PAD / 2
+
+      const sx = f * meta.frameWidth
+      const sy = anim.row * meta.frameHeight
+
+      ctx.fillStyle = '#1a1a2e'
+      ctx.fillRect(dx, dy, THUMB_SIZE, THUMB_SIZE)
+
+      const scale = Math.min(
+        THUMB_SIZE / meta.frameWidth,
+        THUMB_SIZE / meta.frameHeight,
+      )
+      const fw = meta.frameWidth * scale
+      const fh = meta.frameHeight * scale
+
+      ctx.imageSmoothingEnabled = false
+      ctx.drawImage(
+        image,
+        sx,
+        sy,
+        meta.frameWidth,
+        meta.frameHeight,
+        dx + (THUMB_SIZE - fw) / 2,
+        dy + (THUMB_SIZE - fh) / 2,
+        fw,
+        fh,
+      )
+
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'
+      ctx.font = 'bold 11px monospace'
+      ctx.fillText(String(f), dx + 3, dy + 13)
+    }
   }
 }

@@ -20,6 +20,18 @@ export class Sprite {
   }
 
   private getFrameRect(index: number) {
+    const animMeta =
+      this.meta.animations?.[this.currentAnim as keyof typeof this.meta.animations]
+    if (animMeta) {
+      const anim = this.getAnim()
+      const frameInAnim = index - (anim?.startFrame ?? 0)
+      return {
+        sx: frameInAnim * this.meta.frameWidth,
+        sy: animMeta.row * this.meta.frameHeight,
+        sw: this.meta.frameWidth,
+        sh: this.meta.frameHeight,
+      }
+    }
     const col = index % this.meta.columns
     const row = Math.floor(index / this.meta.columns)
     return {

@@ -1,3 +1,9 @@
+export interface SpriteAnimationMeta {
+  row: number
+  frames: number
+  fps: number
+}
+
 export interface SpritesheetMeta {
   frameWidth: number
   frameHeight: number
@@ -5,6 +11,7 @@ export interface SpritesheetMeta {
   columns: number
   rows: number
   fps: number
+  animations?: Record<string, SpriteAnimationMeta>
 }
 
 export interface AnimationDef {
