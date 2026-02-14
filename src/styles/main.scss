@@ -249,18 +249,19 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-width: 0;
 }
 
 // Game area (embedded)
 
 .game-area {
-  flex: 1;
   position: relative;
-  min-height: 200px;
+  height: 440px;
 }
 
 #game-canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;

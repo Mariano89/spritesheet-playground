@@ -3,20 +3,6 @@ import { Player } from './player.ts'
 import { clamp, el } from './utils.ts'
 
 const GROUND_Y = 400
-const LEVEL_WIDTH = 3000
-
-const PLATFORMS: Platform[] = [
-  { x: -200, y: GROUND_Y, w: LEVEL_WIDTH + 400, h: 40, color: '#1e3a5f' },
-  { x: 250, y: 300, w: 160, h: 16, color: '#2a4a7f' },
-  { x: 500, y: 240, w: 200, h: 16, color: '#2a4a7f' },
-  { x: 800, y: 300, w: 140, h: 16, color: '#2a4a7f' },
-  { x: 1050, y: 220, w: 180, h: 16, color: '#2a4a7f' },
-  { x: 1350, y: 320, w: 220, h: 16, color: '#2a4a7f' },
-  { x: 1650, y: 260, w: 160, h: 16, color: '#2a4a7f' },
-  { x: 1900, y: 200, w: 200, h: 16, color: '#2a4a7f' },
-  { x: 2200, y: 300, w: 180, h: 16, color: '#2a4a7f' },
-  { x: 2500, y: 240, w: 160, h: 16, color: '#2a4a7f' },
-]
 
 export class Game {
   private ctx: CanvasRenderingContext2D
@@ -25,7 +11,6 @@ export class Game {
   private running = false
   private raf = 0
   private lastTime = 0
-  private cameraX = 0
   private player: Player
   private image: HTMLImageElement
   private meta: SpritesheetMeta
@@ -53,7 +38,7 @@ export class Game {
       animations,
       scale,
       100,
-      GROUND_Y - scaledH,
+      -scaledH,
     )
 
     this.resizeObserver = new ResizeObserver(() => this.resize())
@@ -63,7 +48,7 @@ export class Game {
 
   private resize() {
     this.canvas.width = this.container.clientWidth
-    this.canvas.height = this.container.clientHeight
+    this.canvas.height = GROUND_Y + 40
   }
 
   updateAnimations(animations: AnimationMap, scale: number) {
@@ -105,19 +90,15 @@ export class Game {
   }
 
   private update(dt: number) {
-    this.player.update(dt, PLATFORMS)
-
-    const targetX = this.player.x - this.canvas.width / 3
-    this.cameraX = clamp(
-      targetX,
-      0,
-      Math.max(0, LEVEL_WIDTH - this.canvas.width),
-    )
-    this.player.x = clamp(this.player.x, 0, LEVEL_WIDTH - this.player.w)
+    const ground: Platform[] = [
+      { x: 0, y: GROUND_Y, w: this.canvas.width, h: 40, color: '#1e3a5f' },
+    ]
+    this.player.update(dt, ground)
+    this.player.x = clamp(this.player.x, 0, this.canvas.width - this.player.w)
 
     if (this.player.y > GROUND_Y + 200) {
       this.player.x = 100
-      this.player.y = GROUND_Y - this.player.h
+      this.player.y = -this.player.h
       this.player.vy = 0
     }
 
@@ -125,7 +106,7 @@ export class Game {
   }
 
   private render() {
-    const { ctx, canvas, cameraX } = this
+    const { ctx, canvas } = this
     const w = canvas.width
     const h = canvas.height
 
@@ -135,15 +116,12 @@ export class Game {
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, w, h)
 
-    for (const p of PLATFORMS) {
-      const sx = p.x - cameraX
-      if (sx + p.w < 0 || sx > w) continue
-      ctx.fillStyle = p.color
-      ctx.fillRect(sx, p.y, p.w, p.h)
-      ctx.fillStyle = 'rgba(255,255,255,0.08)'
-      ctx.fillRect(sx, p.y, p.w, 3)
-    }
+    // Ground
+    ctx.fillStyle = '#1e3a5f'
+    ctx.fillRect(0, GROUND_Y, w, 40)
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'
+    ctx.fillRect(0, GROUND_Y, w, 3)
 
-    this.player.draw(ctx, cameraX)
+    this.player.draw(ctx, 0)
   }
 }
